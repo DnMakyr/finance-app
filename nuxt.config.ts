@@ -5,5 +5,8 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ['@nuxt/ui']
+  modules: ['@nuxt/ui', '@nuxtjs/supabase'],
+  supabase: {
+    redirect: false,
+  },
 })

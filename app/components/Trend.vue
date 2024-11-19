@@ -5,7 +5,7 @@
     </div>
     <div class="text-2xl font-extrabold text-black dark:text-white mb-2">
       <USkeleton class="h-8 w-full" v-if="loading" />
-      <div v-else>{{ amount }}</div>
+      <div v-else>{{ currency }}</div>
     </div>
     <div>
       <USkeleton class="h-6 w-full" v-if="loading" />
@@ -28,6 +28,8 @@ const props = defineProps<{
 
 const trendingUp = computed(() => Number(props.amount) >= Number(props.lastAmount));
 const icon = computed(() => trendingUp.value ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down');
+const { currency } = useCurrency(props.amount);
+
 const percentageTrend = computed(() => {
   if (props.amount === 0 || props.lastAmount === 0) return '∞';
 

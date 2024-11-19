@@ -1,8 +1,10 @@
 <template>
   <div class="container mx-auto max-w-4xl">
-    <AppHeader/>
+    <AppHeader />
     <main class="mt-10">
-      <slot />
+      <UContainer>
+        <slot />
+      </UContainer>
     </main>
   </div>
 </template>
