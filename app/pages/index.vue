@@ -22,17 +22,15 @@
       </div>
     </div>
     <div>
-      <UButton color="white" variant="outline" @click="" :loading="isLoading">
-        Add
-      </UButton>
+      <UButton icon="i-heroicons-plus-circle" color="white" variant="outline" @click="isOpen = true" :loading="isLoading" label="Add"/>
+      <TransactionModal v-model="isOpen" />
     </div>
   </section>
 
   <section v-if="!isLoading">
     <div v-for="(transactionsOnDay, date) in transactionGroupedByDate" :key="date" class="mb-10">
-      <DailyTransactionSummary :date="date" :transactions="transactionsOnDay" />
-      <Transaction v-for="transaction in transactionsOnDay" :key="transaction.id" :transaction="transaction"
-        @deleted="fetchTransactions()" />
+      <DailyTransactionSummary :date="date as string" :transactions="transactionsOnDay" />
+      <Transaction v-for="transaction in transactionsOnDay as Transaction[]" :key="transaction.id" :transaction="transaction" @deleted="fetchTransactions()" />
     </div>
   </section>
   <section v-else>
@@ -41,13 +39,16 @@
 </template>
 
 <script lang="ts" setup>
+import type { Transaction } from '~/types/transaction';
 import { transactionViewOptions } from '~/constants'
 const selectedView = ref(transactionViewOptions[1])
 
 const supabase = useSupabaseClient()
 
-const transactions = ref([])
+const transactions = ref<Transaction[]>([])
 const isLoading = ref(false)
+
+const isOpen = ref(false)
 
 const income = computed(() => {
   return transactions.value.filter(t => t.type === 'Income')
@@ -73,12 +74,12 @@ const expenseTotal = computed(() => {
 const fetchTransactions = async () => {
   isLoading.value = true
   try {
-    const { data } = await useAsyncData('transactions', async () => {
+    const { data } = await useAsyncData<Transaction[]>('transactions', async () => {
       const { data, error } = await supabase.from('transactions').select()
       if (error) return []
       return data
     })
-    transactions.value = data.value
+    transactions.value = data.value || []
   }
   finally {
     isLoading.value = false
@@ -92,15 +93,20 @@ const refreshTransactions = async () => {
 await refreshTransactions()
 
 const transactionGroupedByDate = computed(() => {
-  let grouped = {}
+  let grouped: { [key: string]: Transaction[] } = {}
 
   for (const transaction of transactions.value) {
-    const date = new Date(transaction.created_at).toISOString().split('T')[0]
+    const date = new Date(transaction.created_at).toISOString().split('T')[0] as string
     if (!grouped[date]) {
       grouped[date] = []
     }
     grouped[date].push(transaction)
   }
   return grouped
+})
+
+useSeoMeta({
+  title: 'Home',
+  description: 'This is the home page'
 })
 </script>

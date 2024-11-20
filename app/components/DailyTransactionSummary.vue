@@ -10,9 +10,11 @@
 </template>
 
 <script lang="ts" setup>
+import type { Transaction } from '~/types/transaction';
+
 const props = defineProps<{
-  date: String;
-  transactions: Object[];
+  date: string;
+  transactions: Transaction[];
 }>()
 const formatedDate = computed(() => {
   const date = new Date(props.date)

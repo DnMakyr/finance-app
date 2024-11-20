@@ -27,8 +27,10 @@
 </template>
 
 <script lang="ts" setup>
+import type { Transaction } from '~/types/transaction';
+
 const props = defineProps<{
-  transaction: Object
+  transaction: Transaction;
 }>()
 
 const emit = defineEmits(['deleted'])
