@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { transactionTypeOptions, categoryOptions } from '~/constants';
-import {z} from 'zod';
-import type { FormSubmitEvent} from "#ui/types"
+import { z } from 'zod';
+import type { FormSubmitEvent } from "#ui/types"
+import type { Transaction } from '~/types/transaction';
 
 const model = defineModel<boolean>()
 
@@ -16,7 +17,7 @@ const initialState = {
   created_at: undefined
 }
 
-const state = ref({...initialState})
+const state = ref({ ...initialState })
 
 const defaultSchema = z.object({
   amount: z.number().positive("Amount must greater than 0"),
@@ -46,12 +47,38 @@ const schema = z.intersection(
 )
 
 type Schema = z.output<typeof schema>
+const emit = defineEmits(['saved'])
 
-const onSubmit = (event: FormSubmitEvent<Schema>) => {
-  console.log(event)
+const supabase = useSupabaseClient()
+const isLoading = ref(false)
+const toast = useToast()
+const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  if (!event.data) {
+      return
+    }
+  isLoading.value = true
+  try {
+    const { error } = await supabase.from('transactions').upsert({...state.value})
+
+    if (error) {
+      toast.add({ title: 'Error', description: error.message, icon: 'i-heroicons-exclaimation-circle-20-solid' })
+      throw new Error(error.message)
+    }
+    toast.add({ title: 'Success', description: 'Transaction added', 'icon': 'i-heroicons-check-circle-20-solid' })
+    emit('saved')
+    model.value = false
+  }
+  catch (e: any) {
+    toast.add({ title: 'Error', description: e.message, icon: 'i-heroicons-exclaimation-circle-20-solid' })
+    console.error(e)
+  }
+  finally {
+    isLoading.value = false
+  }
 }
 const resetForm = () => {
   Object.assign(state.value, initialState)
+  form.value = null
 }
 
 onMounted(() => {
@@ -82,15 +109,15 @@ onMounted(() => {
             </UFormGroup>
 
             <UFormGroup label="Amount" name="amount" :required="true">
-              <UInput type="number" v-model.number="state.amount" aria-autocomplete="none" autocomplete="false"/>
+              <UInput type="number" v-model.number="state.amount" aria-autocomplete="none" autocomplete="false" />
             </UFormGroup>
 
             <UFormGroup label="Description" name="description" hint="Optional">
               <UInput type="text" v-model.trim="state.description" placeholder="Description" aria-autocomplete="none" />
             </UFormGroup>
 
-            <UFormGroup label="Category" name="category" hint="Optional" v-if="state.type === 'Expense'">
-              <USelectMenu v-model="state.category" :options="categoryOptions" placeholder="Category"/>
+            <UFormGroup label="Category" name="category":required="true" v-if="state.type === 'Expense'">
+              <USelectMenu v-model="state.category" :options="categoryOptions" placeholder="Category" />
             </UFormGroup>
 
             <UFormGroup label="Date" name="created_at" :required="true">

@@ -1,7 +1,8 @@
 <template>
   <header class="flex justify-between items-center mt-10">
     <NuxtLink to="/" class="text-xl font-bold"> Finance Tracker </NuxtLink>
-    <div>
+    <div class="flex items-center space-x-4">
+      <NavColorSelector />
       <UAvatar
         src="https://avatars.githubusercontent.com/u/739984?v=4"
         alt="Avatar"
