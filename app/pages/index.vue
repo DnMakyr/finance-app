@@ -5,7 +5,9 @@ const selectedView = ref(transactionViewOptions[1])
 
 const isOpen = ref(false)
 
-const { transactions: { income, expense, incomeCount, expenseCount, incomeTotal, expenseTotal, grouped: byDate }, fetchTransactions, refresh, pending } = useTransactions()
+const {current, previous} = useSelectedTimePeriod(selectedView)
+
+const { transactions: { income, expense, incomeCount, expenseCount, incomeTotal, expenseTotal, grouped: byDate }, fetchTransactions, refresh, pending } = useFetchTransactions(current)
 
 await fetchTransactions()
 
@@ -24,10 +26,10 @@ useSeoMeta({
     </div>
   </section>
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend color="white" title="Income" :amount="incomeTotal" :lastAmount="900" :loading="pending" />
-    <Trend color="white" title="Expenses" :amount="expenseTotal" :lastAmount="600" :loading="pending" />
-    <Trend color="white" title="Profit" :amount="100" :lastAmount="10" :loading="pending" />
-    <Trend color="white" title="Revenue" :amount="10000" :lastAmount="9000" :loading="pending" />
+    <Trend color="white" title="Income" :amount="incomeTotal" :lastAmount="0" :loading="pending" />
+    <Trend color="white" title="Expenses" :amount="expenseTotal" :lastAmount="0" :loading="pending" />
+    <Trend color="white" title="Profit" :amount="0" :lastAmount="0" :loading="pending" />
+    <Trend color="white" title="Revenue" :amount="0" :lastAmount="0" :loading="pending" />
   </section>
 
   <section class="flex justify-between mb-10">
