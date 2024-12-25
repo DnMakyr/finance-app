@@ -5,8 +5,6 @@ export const useFetchTransactions = (period: ComputedRef) => {
   const transactions = ref<Transaction[]>([])
   const pending = ref(false)
 
-  watch(period, () => {refresh()})
-
   const income = computed(() => {
     return transactions.value.filter(t => t.type === 'Income')
   })
@@ -31,7 +29,7 @@ export const useFetchTransactions = (period: ComputedRef) => {
   const fetchTransactions = async () => {
     pending.value = true
     try {
-      const { data } = await useAsyncData<Transaction[]>(`transactions=${period.value.from.toDateString()}`, async () => {
+      const { data } = await useAsyncData<Transaction[]>(`transactions-${period.value.from.toDateString()}-${period.value.to.toDateString()}`, async () => {
         const { data, error } = await supabase.from('transactions').select()
           .gte('created_at', period.value.from.toISOString())
           .lte('created_at', period.value.to.toISOString())
@@ -46,7 +44,7 @@ export const useFetchTransactions = (period: ComputedRef) => {
     }
   }
 
-  const byDate = computed(() => {
+  const transactionsGroupedByDate = computed(() => {
     let grouped: { [key: string]: Transaction[] } = {}
 
     for (const transaction of transactions.value) {
@@ -63,15 +61,20 @@ export const useFetchTransactions = (period: ComputedRef) => {
     await fetchTransactions()
   }
 
+  watch(period, async () => { await refresh()}, { immediate: true })
+
   return {
     transactions: {
+      all: transactions,
       income,
       expense,
       incomeCount,
       expenseCount,
       incomeTotal,
       expenseTotal,
-      grouped: byDate,
+      grouped: {
+        byDate: transactionsGroupedByDate,
+      },
     },
     pending,
     fetchTransactions,

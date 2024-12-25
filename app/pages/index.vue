@@ -5,13 +5,31 @@ const selectedView = ref(transactionViewOptions[1])
 
 const isOpen = ref(false)
 
-const {current, previous} = useSelectedTimePeriod(selectedView)
+const { current, previous } = useSelectedTimePeriod(selectedView)
 
-const { transactions: { income, expense, incomeCount, expenseCount, incomeTotal, expenseTotal, grouped: byDate }, fetchTransactions, refresh, pending } = useFetchTransactions(current)
+const { transactions: {
+  income,
+  expense,
+  incomeCount,
+  expenseCount,
+  incomeTotal,
+  expenseTotal,
+  grouped: { byDate } },
+  fetchTransactions,
+  refresh,
+  pending } = useFetchTransactions(current)
+
+  await refresh()
+const { transactions: {
+  incomeTotal: prevIncomeTotal,
+  expenseTotal: prevExpenseTotal,
+}, refresh: refreshPrevious } = useFetchTransactions(previous)
+
+await refreshPrevious()
 
 await fetchTransactions()
 
-await refresh()
+
 useSeoMeta({
   title: 'Home',
   description: 'This is the home page'
@@ -26,8 +44,8 @@ useSeoMeta({
     </div>
   </section>
   <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
-    <Trend color="white" title="Income" :amount="incomeTotal" :lastAmount="0" :loading="pending" />
-    <Trend color="white" title="Expenses" :amount="expenseTotal" :lastAmount="0" :loading="pending" />
+    <Trend color="white" title="Income" :amount="incomeTotal" :lastAmount="prevIncomeTotal" :loading="pending" />
+    <Trend color="white" title="Expenses" :amount="expenseTotal" :lastAmount="prevExpenseTotal" :loading="pending" />
     <Trend color="white" title="Profit" :amount="0" :lastAmount="0" :loading="pending" />
     <Trend color="white" title="Revenue" :amount="0" :lastAmount="0" :loading="pending" />
   </section>
