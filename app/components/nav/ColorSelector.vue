@@ -1,6 +1,6 @@
 <template>
   <div>
-      <button @click="toggleMode" class="hover:bg-slate-700 dark:hover:bg-slate-300 text-gray-500 rounded-full">{{ nextModeIcon }}</button>
+      <UButton @click="toggleMode" class="text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-white" variant="ghost" :icon="nextModeIcon"/>
   </div>
 </template>
 
@@ -11,8 +11,8 @@ const modes = [
   'dark',
 ]
 const nextModeIcons = {
-light: '🌕',
-dark: '☀️'
+light: 'i-heroicons-moon',
+dark: 'i-heroicons-sun',
 }
 
 const nextMode = computed<string>( () => {
