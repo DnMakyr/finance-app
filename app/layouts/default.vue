@@ -1,36 +1,35 @@
 <template>
   <div class="container mx-auto max-w-4xl">
     <AppHeader />
-    <main class="mt-10">
-      <UContainer>
-        <slot />
-      </UContainer>
+    <main class="my-10">
+      <slot />
     </main>
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 useHead({
   link: [
     {
       rel: 'preconnect',
-      href: 'https://fonts.googleapis.com',
+      href: 'https://fonts.googleapis.com'
     },
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Inter&display=swap',
-      crossorigin: '',
+      crossorigin: ''
     }
   ]
 })
 </script>
 
 <style>
+/* Set the font family for the entire site */
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter';
 }
-
+/* Set the background color for the entire site */
 body {
-  @apply dark:bg-gray-900 bg-white;
+  @apply dark:bg-gray-900 bg-white
 }
 </style>
