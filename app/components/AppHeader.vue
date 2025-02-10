@@ -28,18 +28,20 @@
   </header>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const items = [
   [{
-    label: user.value?.email,
+    label: user.value?.email || 'No email',
     slot: 'account',
     disabled: true
   }], [{
     label: 'Settings',
     icon: 'i-heroicons-cog-8-tooth',
-    click: () => console.log('Link to settings in the future')
+    click: () => {
+      return navigateTo('/settings')
+    }
   }, {
     label: 'Sign out',
     icon: 'i-heroicons-arrow-left-on-rectangle',
