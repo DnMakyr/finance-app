@@ -51,25 +51,30 @@ const emit = defineEmits(['saved'])
 
 const supabase = useSupabaseClient()
 const isLoading = ref(false)
-const toast = useToast()
+const { toastError, toastSuccess } = useAppToast()
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   if (!event.data) {
-      return
-    }
+    return
+  }
   isLoading.value = true
   try {
-    const { error } = await supabase.from('transactions').upsert({...state.value})
+    const { error } = await supabase.from('transactions').upsert({ ...state.value })
 
     if (error) {
-      toast.add({ title: 'Error', description: error.message, icon: 'i-heroicons-exclaimation-circle-20-solid' })
+      toastError({
+        title: 'Transaction not saved',
+        description: error.message,
+      })
       throw new Error(error.message)
     }
-    toast.add({ title: 'Success', description: 'Transaction added', 'icon': 'i-heroicons-check-circle-20-solid' })
+    toastSuccess({
+      'title': 'Transaction saved'
+    })
     emit('saved')
     model.value = false
   }
   catch (e: any) {
-    toast.add({ title: 'Error', description: e.message, icon: 'i-heroicons-exclaimation-circle-20-solid' })
+    toastError({ title: 'Error', description: e.message })
     console.error(e)
   }
   finally {
@@ -116,7 +121,7 @@ onMounted(() => {
               <UInput type="text" v-model.trim="state.description" placeholder="Description" aria-autocomplete="none" />
             </UFormGroup>
 
-            <UFormGroup label="Category" name="category":required="true" v-if="state.type === 'Expense'">
+            <UFormGroup label="Category" name="category" :required="true" v-if="state.type === 'Expense'">
               <USelectMenu v-model="state.category" :options="categoryOptions" placeholder="Category" />
             </UFormGroup>
 

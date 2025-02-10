@@ -3,7 +3,7 @@
 const success = ref<boolean>(false)
 const email = ref<string>('')
 const pending = ref<boolean>(false)
-const toast = useToast()
+const {toastError} = useAppToast()
 
 const supabase = useSupabaseClient()
 
@@ -18,23 +18,17 @@ const handleLogin = async () => {
       }
     })
     if (error) {
-      toast.add({
+      toastError({
         title: 'Error',
         description: "Something went wrong. Please try again.",
-        icon: 'i-heroicons-exclamation-circle',
-        color: 'red',
-        timeout: 5000,
       })
       throw error
     }
     success.value = true
   } catch (error) {
-    toast.add({
+    toastError({
       title: 'Error',
       description: "Something went wrong. Please try again.",
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'red',
-      timeout: 5000,
     })
   } finally {
     pending.value = false
