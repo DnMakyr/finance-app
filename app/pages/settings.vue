@@ -9,8 +9,8 @@ const links = [
     to: '/settings/avatar'
   },
   {
-    label: 'Settings',
-    to: '/settings/settings'
+    label: 'Configuration',
+    to: '/settings/configuration'
   }
 ]
 </script>
