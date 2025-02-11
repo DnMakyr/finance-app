@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { Transaction } from '~/types/transaction';
-import { transactionViewOptions } from '~/constants'
-const selectedView = ref(transactionViewOptions[1])
+import { transactionViewOptions } from '~/constants';
+
+const user = useSupabaseUser()
+const selectedView = ref(user.value?.user_metadata?.transaction_view ?? transactionViewOptions[1])
 
 const isOpen = ref(false)
 
