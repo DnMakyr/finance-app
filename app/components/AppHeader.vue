@@ -1,3 +1,28 @@
+<script lang="ts" setup>
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
+const items = [
+  [{
+    label: user.value?.email || 'No email',
+    slot: 'account',
+    disabled: true
+  }], [{
+    label: 'Settings',
+    icon: 'i-heroicons-cog-8-tooth',
+    click: () => {
+      return navigateTo('/settings')
+    }
+  }, {
+    label: 'Sign out',
+    icon: 'i-heroicons-arrow-left-on-rectangle',
+    click: async () => {
+      await supabase.auth.signOut()
+      return navigateTo('/login')
+    }
+  }]
+]
+</script>
+
 <template>
   <header class="flex justify-between items-center mt-10">
     <NuxtLink to="/" class="text-xl font-bold">
@@ -27,28 +52,3 @@
     </div>
   </header>
 </template>
-
-<script lang="ts" setup>
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
-const items = [
-  [{
-    label: user.value?.email || 'No email',
-    slot: 'account',
-    disabled: true
-  }], [{
-    label: 'Settings',
-    icon: 'i-heroicons-cog-8-tooth',
-    click: () => {
-      return navigateTo('/settings')
-    }
-  }, {
-    label: 'Sign out',
-    icon: 'i-heroicons-arrow-left-on-rectangle',
-    click: async () => {
-      await supabase.auth.signOut()
-      return navigateTo('/login')
-    }
-  }]
-]
-</script>
