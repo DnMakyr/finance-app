@@ -4,18 +4,37 @@ import { z } from 'zod';
 import type { FormSubmitEvent } from "#ui/types"
 import type { Transaction } from '~/types/transaction';
 
+
+interface State {
+  amount?: number
+  description?: string
+  type?: string
+  category?: string
+  created_at?: string
+}
+
 const model = defineModel<boolean>()
+
+const { transaction } = defineProps<{ transaction?: Transaction }>()
+
+const isEditing = computed(() => !!transaction)
 
 const form = ref()
 
 
-const initialState = {
+const initialState = (isEditing.value ? {
+  type: transaction?.type,
+  amount: transaction?.amount,
+  description: transaction?.description,
+  category: transaction?.category,
+  created_at: transaction?.created_at?.split('T')[0]
+} : {
   amount: 0,
   description: undefined,
   type: undefined,
   category: undefined,
   created_at: undefined
-}
+})
 
 const state = ref({ ...initialState })
 
@@ -47,19 +66,18 @@ const schema = z.intersection(
 )
 
 type Schema = z.output<typeof schema>
-const emit = defineEmits(['saved'])
+const emit = defineEmits(['saved', 'edited'])
 
 const supabase = useSupabaseClient()
 const isLoading = ref(false)
 const { toastError, toastSuccess } = useAppToast()
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+const saveTransaction = async (event: FormSubmitEvent<Schema>) => {
   if (!event.data) {
     return
   }
   isLoading.value = true
   try {
-    const { error } = await supabase.from('transactions').upsert({ ...state.value })
-
+    const { error } = await supabase.from('transactions').upsert({ ...state.value, id: transaction?.id })
     if (error) {
       toastError({
         title: 'Transaction not saved',
@@ -108,13 +126,14 @@ onMounted(() => {
           Add Transaction
         </template>
         <div>
-          <UForm :state="state" :schema="schema" :ref="form" class="space-y-2" @submit="onSubmit">
+          <UForm :state="state" :schema="schema" :ref="form" class="space-y-2" @submit="saveTransaction">
             <UFormGroup label="Type" name="type" :required="true">
-              <USelectMenu v-model="state.type" :options="transactionTypeOptions" />
+              <USelectMenu :disabled="isEditing" v-model="state.type" :options="transactionTypeOptions" />
             </UFormGroup>
 
             <UFormGroup label="Amount" name="amount" :required="true">
-              <UInput type="number" v-model.number="state.amount" aria-autocomplete="none" autocomplete="false" />
+              <UInput type="number" v-model.number="state.amount" aria-autocomplete="none"
+                autocomplete="false" />
             </UFormGroup>
 
             <UFormGroup label="Description" name="description" hint="Optional">
