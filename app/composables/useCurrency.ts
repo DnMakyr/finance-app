@@ -1,10 +1,8 @@
 export const useCurrency = (amount: number | Ref<number>) => {
-    const currency = computed(() => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(isRef(amount) ? amount.value : amount)
-    })
+    const formattedAmount = computed(() => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    }).format(unref(amount)))
 
-    return { currency } 
+    return { currency: formattedAmount }
 }
