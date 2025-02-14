@@ -1,13 +1,14 @@
 <script lang="ts" setup>
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
 const { toastSuccess, toastError } = useAppToast()
+const { url } = useAvatarUrl()
 
 const uploading = ref(false)
 const fileInput = useTemplateRef('fileInput')
 
-console.log(user.value)
 
 const saveAvatar = async () => {
   const file = fileInput.value?.input?.files?.[0]
@@ -16,8 +17,6 @@ const saveAvatar = async () => {
     toastError({ title: 'Select a file to upload first' })
     return
   }
-
-  console.log(file)
 
   const fileExt = file.name.split('.').pop()
   const fileName = `${Math.random()}.${fileExt}`
@@ -40,8 +39,9 @@ const saveAvatar = async () => {
     })
     // 4. (OPTIONALLY) remove the old avatar file
     if (currentAvatarUrl) {
-      await supabase.storage.from('avatars')
+      const { error } = await supabase.storage.from('avatars')
         .remove([currentAvatarUrl])
+      if (error) throw error
     }
 
     // 5. Reset the file input
@@ -74,7 +74,7 @@ useHead({
   <div>
     <div class="mb-4">
       <UFormGroup label="Current avatar" class="w-full" help="This would be blank by default">
-        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" size="3xl" />
+        <UAvatar :src="url || ''" size="3xl" />
       </UFormGroup>
     </div>
 

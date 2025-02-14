@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+
+const { url } = useAvatarUrl()
 const items = [
   [{
     label: user.value?.email || 'No email',
@@ -30,7 +32,7 @@ const items = [
     </NuxtLink>
     <div>
       <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' }, width: 'w-64' }" v-if="user">
-        <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" alt="Avatar" />
+        <UAvatar :src="url || ''" alt="Avatar" />
 
         <template #account="{ item }">
           <div class="text-left">
